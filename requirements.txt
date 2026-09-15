@@ -1,0 +1,14 @@
+streamlit
+langgraph
+langgraph-checkpoint-sqlite
+langchain-openai
+langchain-core
+langchain-anthropic
+langchain-google-genai
+yfinance
+python-dotenv
+pydantic
+stockstats
+pandas
+requests
+pytz
