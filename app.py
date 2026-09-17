@@ -11,10 +11,27 @@ try:
     from tradingagents.graph.trading_graph import TradingAgentsGraph
 except ImportError as e:
     st.error(f"Failed to import TradingAgentsGraph: {e}")
-    st.stop()
-
-# Set page config
 import os
+import pyrebase
+import streamlit as st
+
+firebaseConfig = {
+  "apiKey": "AIzaSyCNOxE5_0mXQYVG8t4IkUz50Qw8hyPTrSA",
+  "authDomain": "intellitrade-82939.firebaseapp.com",
+  "projectId": "intellitrade-82939",
+  "storageBucket": "intellitrade-82939.firebasestorage.app",
+  "messagingSenderId": "852041578558",
+  "appId": "1:852041578558:web:9342a6d2c5884dfec5396f",
+  "measurementId": "G-46PZN3EZ5T",
+  "databaseURL": ""
+}
+
+try:
+    firebase = pyrebase.initialize_app(firebaseConfig)
+    auth = firebase.auth()
+except Exception as e:
+    auth = None
+
 logo_path = os.path.join(os.path.dirname(__file__), "logo.jpg")
 
 st.set_page_config(
@@ -85,12 +102,66 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+def render_auth_ui():
+    st.markdown("<h2 style='text-align: center; margin-top: 50px;'>Welcome to IntelliTrade</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #888;'>Please sign in to access your AI trading agents.</p>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        tab1, tab2 = st.tabs(["Login", "Sign Up"])
+        
+        with tab1:
+            with st.form("login_form"):
+                email = st.text_input("Email")
+                password = st.text_input("Password", type="password")
+                submitted = st.form_submit_button("Sign In", use_container_width=True)
+                
+                if submitted:
+                    if auth:
+                        try:
+                            user = auth.sign_in_with_email_and_password(email, password)
+                            st.session_state['user'] = user
+                            st.rerun()
+                        except Exception as e:
+                            if "INVALID_LOGIN_CREDENTIALS" in str(e):
+                                st.error("Incorrect email or password.")
+                            else:
+                                st.error(f"Login failed: Make sure Email/Password Auth is enabled in your Firebase Console.")
+                    else:
+                        st.error("Firebase Auth is not initialized.")
+                        
+        with tab2:
+            with st.form("signup_form"):
+                new_email = st.text_input("Email")
+                new_password = st.text_input("Password", type="password")
+                signup_submitted = st.form_submit_button("Create Account", use_container_width=True)
+                
+                if signup_submitted:
+                    if auth:
+                        try:
+                            user = auth.create_user_with_email_and_password(new_email, new_password)
+                            st.success("Account created! You can now log in.")
+                        except Exception as e:
+                            st.error(f"Signup failed: Make sure Email/Password Auth is enabled in your Firebase Console.")
+                    else:
+                        st.error("Firebase Auth is not initialized.")
+
+if 'user' not in st.session_state:
+    render_auth_ui()
+    st.stop()
+
+# --- Main App (Only runs if logged in) ---
+
 col1, col2 = st.columns([1, 8])
 with col1:
     st.image(logo_path, width=100)
 with col2:
     st.markdown('<h1 class="main-title">IntelliTrade</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Advanced Autonomous AI Trading Analysis</p>', unsafe_allow_html=True)
+
+if st.button("Log Out"):
+    del st.session_state['user']
+    st.rerun()
 
 CONFIG_FILE = "ui_config.json"
 
