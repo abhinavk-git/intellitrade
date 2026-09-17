@@ -140,7 +140,7 @@ def render_auth_ui():
         st.write("")
         col_logo1, col_logo2, col_logo3 = st.columns([1.5, 2, 1.5])
         with col_logo2:
-            st.image(logo_path, use_column_width=True)
+            st.image(logo_path, use_container_width=True)
             
         st.markdown("<h2 style='text-align: center; margin-top: 10px; font-weight: 800; letter-spacing: 1px;'>IntelliTrade</h2>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; color: #a0a0a0; font-size: 14px; margin-bottom: 30px;'>Sign in to access your autonomous AI trading swarm.</p>", unsafe_allow_html=True)
