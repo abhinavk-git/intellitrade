@@ -191,7 +191,7 @@ def load_config():
     return {}
 
 def save_config():
-    keys_to_save = ["ticker", "asset_type", "llm_provider", "openai_key", "anthropic_key", "google_key"]
+    keys_to_save = ["ticker", "asset_type", "llm_provider", "openai_key", "anthropic_key", "google_key", "kite_api_key", "kite_api_secret"]
     data = {k: st.session_state[k] for k in keys_to_save if k in st.session_state}
     with open(CONFIG_FILE, "w") as f:
         json.dump(data, f)
@@ -208,6 +208,8 @@ if "llm_provider" not in st.session_state: st.session_state["llm_provider"] = "o
 if "openai_key" not in st.session_state: st.session_state["openai_key"] = ""
 if "anthropic_key" not in st.session_state: st.session_state["anthropic_key"] = ""
 if "google_key" not in st.session_state: st.session_state["google_key"] = ""
+if "kite_api_key" not in st.session_state: st.session_state["kite_api_key"] = ""
+if "kite_api_secret" not in st.session_state: st.session_state["kite_api_secret"] = ""
 
 with st.sidebar:
     st.image(logo_path, width=80)
@@ -236,13 +238,20 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 🔌 Broker Integrations")
     with st.expander("🦅 Zerodha Kite"):
-        kite_api_key = st.text_input("Kite API Key", type="password", help="Enter your Kite Connect API Key")
-        kite_api_secret = st.text_input("Kite API Secret", type="password")
-        if st.button("Connect to Kite (Read-Only)", use_container_width=True):
+        kite_api_key = st.text_input("Kite API Key", type="password", key="kite_api_key", on_change=save_config)
+        kite_api_secret = st.text_input("Kite API Secret", type="password", key="kite_api_secret", on_change=save_config)
+        
+        req_token = st.query_params.get("request_token")
+        
+        if req_token:
+            st.success("✅ Connected to Kite (Read-Only)!")
+            st.caption("Active Session Token acquired.")
+        else:
             if kite_api_key and kite_api_secret:
-                st.success("Successfully linked Zerodha Kite in View-Only mode!")
+                login_url = f"https://kite.trade/connect/login?v=3&api_key={kite_api_key}"
+                st.markdown(f'<a href="{login_url}" target="_self" style="display: block; text-align: center; background-color: #ff5722; color: white; padding: 10px; border-radius: 5px; text-decoration: none; font-weight: bold;">Login to Kite Connect</a>', unsafe_allow_html=True)
             else:
-                st.warning("Please enter your API Key and Secret first.")
+                st.warning("Enter API Key & Secret to enable login.")
 
     st.markdown("<br>", unsafe_allow_html=True)
     run_btn = st.button("🚀 Run Analysis", type="primary", use_container_width=True)
