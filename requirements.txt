@@ -14,3 +14,4 @@ requests
 pytz
 .
 pyrebase4
+extra-streamlit-components

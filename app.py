@@ -102,6 +102,15 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+import extra_streamlit_components as stx
+import datetime
+
+@st.cache_resource(experimental_allow_widgets=True)
+def get_manager():
+    return stx.CookieManager()
+
+cookie_manager = get_manager()
+
 def render_auth_ui():
     st.write("")
     st.write("")
@@ -129,6 +138,8 @@ def render_auth_ui():
                         try:
                             user = auth.sign_in_with_email_and_password(email, password)
                             st.session_state['user'] = user
+                            # Set a 24-hour cookie
+                            cookie_manager.set("intellitrade_user", user['localId'], expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
                             st.rerun()
                         except Exception as e:
                             if "INVALID_LOGIN_CREDENTIALS" in str(e):
@@ -154,6 +165,12 @@ def render_auth_ui():
                             st.error(f"Signup failed: Make sure Email/Password Auth is enabled in your Firebase Console.")
                     else:
                         st.error("Firebase Auth is not initialized.")
+
+# Check for existing 24-hour cookie
+if 'user' not in st.session_state:
+    cached_user = cookie_manager.get(cookie="intellitrade_user")
+    if cached_user:
+        st.session_state['user'] = cached_user
 
 if 'user' not in st.session_state:
     render_auth_ui()
@@ -226,6 +243,7 @@ with st.sidebar:
     st.markdown("---")
     if st.button("🚪 Log Out", use_container_width=True):
         del st.session_state['user']
+        cookie_manager.delete("intellitrade_user")
         st.rerun()
 
 if run_btn:
