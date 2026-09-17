@@ -21,6 +21,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+st.logo("logo.jpg", size="large")
+
 # Custom CSS for a sleek look
 st.markdown("""
 <style>
@@ -72,7 +74,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<h1 class="main-title">📈 IntelliTrade</h1>', unsafe_allow_html=True)
+col1, col2 = st.columns([1, 8])
+with col1:
+    st.image("logo.jpg", width=100)
+with col2:
+    st.markdown('<h1 class="main-title">IntelliTrade</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Advanced Autonomous AI Trading Analysis</p>', unsafe_allow_html=True)
 
 CONFIG_FILE = "ui_config.json"
