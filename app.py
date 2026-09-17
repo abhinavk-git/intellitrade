@@ -19,7 +19,7 @@ logo_path = os.path.join(os.path.dirname(__file__), "logo.jpg")
 
 st.set_page_config(
     page_title="IntelliTrade",
-    page_icon="📈",
+    page_icon=logo_path,
     layout="wide",
     initial_sidebar_state="expanded"
 )
