@@ -14,6 +14,9 @@ except ImportError as e:
     st.stop()
 
 # Set page config
+import os
+logo_path = os.path.join(os.path.dirname(__file__), "logo.jpg")
+
 st.set_page_config(
     page_title="IntelliTrade",
     page_icon="📈",
@@ -21,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.logo("logo.jpg", size="large")
+st.logo(logo_path, size="large")
 
 # Custom CSS for a sleek look
 st.markdown("""
@@ -76,7 +79,7 @@ st.markdown("""
 
 col1, col2 = st.columns([1, 8])
 with col1:
-    st.image("logo.jpg", width=100)
+    st.image(logo_path, width=100)
 with col2:
     st.markdown('<h1 class="main-title">IntelliTrade</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Advanced Autonomous AI Trading Analysis</p>', unsafe_allow_html=True)
