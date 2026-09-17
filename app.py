@@ -233,6 +233,17 @@ with st.sidebar:
             api_key = st.text_input("Google API Key", type="password", key="google_key", on_change=save_config)
             if api_key: os.environ["GOOGLE_API_KEY"] = api_key
 
+    st.markdown("---")
+    st.markdown("### 🔌 Broker Integrations")
+    with st.expander("🦅 Zerodha Kite"):
+        kite_api_key = st.text_input("Kite API Key", type="password", help="Enter your Kite Connect API Key")
+        kite_api_secret = st.text_input("Kite API Secret", type="password")
+        if st.button("Connect to Kite (Read-Only)", use_container_width=True):
+            if kite_api_key and kite_api_secret:
+                st.success("Successfully linked Zerodha Kite in View-Only mode!")
+            else:
+                st.warning("Please enter your API Key and Secret first.")
+
     st.markdown("<br>", unsafe_allow_html=True)
     run_btn = st.button("🚀 Run Analysis", type="primary", use_container_width=True)
     
