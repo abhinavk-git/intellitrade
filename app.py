@@ -161,16 +161,10 @@ if 'user' not in st.session_state:
 
 # --- Main App (Only runs if logged in) ---
 
-col1, col2 = st.columns([1, 8])
-with col1:
-    st.image(logo_path, width=100)
-with col2:
-    st.markdown('<h1 class="main-title">IntelliTrade</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Advanced Autonomous AI Trading Analysis</p>', unsafe_allow_html=True)
-
-if st.button("Log Out"):
-    del st.session_state['user']
-    st.rerun()
+# Welcome Header
+st.markdown('<h1 class="main-title">IntelliTrade Dashboard</h1>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">Autonomous AI Trading Swarm</p>', unsafe_allow_html=True)
+st.divider()
 
 CONFIG_FILE = "ui_config.json"
 
@@ -203,30 +197,36 @@ if "anthropic_key" not in st.session_state: st.session_state["anthropic_key"] = 
 if "google_key" not in st.session_state: st.session_state["google_key"] = ""
 
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/3256/3256114.png", width=60)
+    st.image(logo_path, width=80)
     st.header("⚙️ Configuration")
     
-    st.markdown("### Asset Details")
+    st.markdown("### Target Asset")
     ticker = st.text_input("Ticker Symbol", key="ticker", on_change=save_config, help="Enter the symbol you want to analyze (e.g., AAPL, BTC-USD)")
     trade_date = st.date_input("Trade Date", datetime.date.today() - datetime.timedelta(days=1))
     asset_type = st.selectbox("Asset Type", ["stock", "crypto"], key="asset_type", on_change=save_config)
     
     st.markdown("---")
-    st.markdown("### 🧠 LLM Settings")
-    llm_provider = st.selectbox("Provider", ["openai", "anthropic", "google"], key="llm_provider", on_change=save_config)
+    st.markdown("### 🧠 AI Engine")
+    llm_provider = st.selectbox("Intelligence Provider", ["openai", "anthropic", "google"], key="llm_provider", on_change=save_config)
     
-    if llm_provider == "openai":
-        api_key = st.text_input("OpenAI API Key", type="password", key="openai_key", on_change=save_config)
-        if api_key: os.environ["OPENAI_API_KEY"] = api_key
-    elif llm_provider == "anthropic":
-        api_key = st.text_input("Anthropic API Key", type="password", key="anthropic_key", on_change=save_config)
-        if api_key: os.environ["ANTHROPIC_API_KEY"] = api_key
-    elif llm_provider == "google":
-        api_key = st.text_input("Google API Key", type="password", key="google_key", on_change=save_config)
-        if api_key: os.environ["GOOGLE_API_KEY"] = api_key
+    with st.expander("🔑 Setup API Keys"):
+        if llm_provider == "openai":
+            api_key = st.text_input("OpenAI API Key", type="password", key="openai_key", on_change=save_config)
+            if api_key: os.environ["OPENAI_API_KEY"] = api_key
+        elif llm_provider == "anthropic":
+            api_key = st.text_input("Anthropic API Key", type="password", key="anthropic_key", on_change=save_config)
+            if api_key: os.environ["ANTHROPIC_API_KEY"] = api_key
+        elif llm_provider == "google":
+            api_key = st.text_input("Google API Key", type="password", key="google_key", on_change=save_config)
+            if api_key: os.environ["GOOGLE_API_KEY"] = api_key
 
     st.markdown("<br>", unsafe_allow_html=True)
-    run_btn = st.button("🚀 Run Analysis", type="primary")
+    run_btn = st.button("🚀 Run Analysis", type="primary", use_container_width=True)
+    
+    st.markdown("---")
+    if st.button("🚪 Log Out", use_container_width=True):
+        del st.session_state['user']
+        st.rerun()
 
 if run_btn:
     if not ticker:
