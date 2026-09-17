@@ -12,3 +12,4 @@ stockstats
 pandas
 requests
 pytz
+.
