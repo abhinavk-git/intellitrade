@@ -119,6 +119,7 @@ def render_auth_ui():
         
         with tab1:
             with st.form("login_form"):
+                username = st.text_input("Username")
                 email = st.text_input("Email")
                 password = st.text_input("Password", type="password")
                 submitted = st.form_submit_button("Sign In", use_container_width=True)
@@ -139,6 +140,7 @@ def render_auth_ui():
                         
         with tab2:
             with st.form("signup_form"):
+                new_username = st.text_input("Username")
                 new_email = st.text_input("Email")
                 new_password = st.text_input("Password", type="password")
                 signup_submitted = st.form_submit_button("Create Account", use_container_width=True)
@@ -147,7 +149,7 @@ def render_auth_ui():
                     if auth:
                         try:
                             user = auth.create_user_with_email_and_password(new_email, new_password)
-                            st.success("Account created! You can now log in.")
+                            st.success(f"Account created for {new_username}! You can now log in.")
                         except Exception as e:
                             st.error(f"Signup failed: Make sure Email/Password Auth is enabled in your Firebase Console.")
                     else:
