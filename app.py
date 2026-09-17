@@ -105,11 +105,7 @@ st.markdown("""
 import extra_streamlit_components as stx
 import datetime
 
-@st.cache_resource
-def get_manager():
-    return stx.CookieManager()
-
-cookie_manager = get_manager()
+cookie_manager = stx.CookieManager(key="cookie_manager_comp")
 
 def render_auth_ui():
     st.write("")
