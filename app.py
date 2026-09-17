@@ -55,6 +55,14 @@ st.markdown("""
         color: #fff;
         padding: 0 16px;
     }
+    /* Hide Streamlit Branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    .stApp {
+        background-color: #0e1117;
+    }
     /* Metrics */
     div[data-testid="metric-container"] {
         background-color: #1e1e24;
