@@ -7,6 +7,7 @@ from .validators import validate_model
 
 
 import time
+import streamlit as st
 
 class NormalizedChatGoogleGenerativeAI(ChatGoogleGenerativeAI):
     """ChatGoogleGenerativeAI with normalized content output.
@@ -16,9 +17,21 @@ class NormalizedChatGoogleGenerativeAI(ChatGoogleGenerativeAI):
     """
 
     def invoke(self, input, config=None, **kwargs):
-        # Gemini Free Tier limit is 15 RPM. Add a 4 second sleep to prevent RESOURCE_EXHAUSTED.
-        time.sleep(4.1)
-        return normalize_content(super().invoke(input, config, **kwargs))
+        retries = 0
+        while True:
+            try:
+                return normalize_content(super().invoke(input, config, **kwargs))
+            except Exception as e:
+                error_str = str(e)
+                if ("429" in error_str or "RESOURCE_EXHAUSTED" in error_str) and retries < 5:
+                    retries += 1
+                    countdown_placeholder = st.empty()
+                    for i in range(10, 0, -1):
+                        countdown_placeholder.warning(f"⏳ Free Tier Speed Limit Reached! Pausing agents... Resuming automatically in {i}s")
+                        time.sleep(1)
+                    countdown_placeholder.empty()
+                else:
+                    raise e
 
 
 class GoogleClient(BaseLLMClient):
