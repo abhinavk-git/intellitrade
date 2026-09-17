@@ -103,49 +103,19 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def render_auth_ui():
-    st.markdown("""
-    <style>
-        div[data-testid="stForm"] {
-            background-color: #1e1e24;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            margin-top: 10px;
-        }
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 24px;
-            justify-content: center;
-        }
-        .stTabs [data-baseweb="tab"] {
-            height: 50px;
-            white-space: pre-wrap;
-            background-color: transparent;
-            border-radius: 4px 4px 0px 0px;
-            gap: 1px;
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-        .stTabs [aria-selected="true"] {
-            background-color: transparent;
-            border-bottom: 2px solid #00ff88;
-            color: #00ff88;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns([1.5, 2, 1.5])
+    st.write("")
+    st.write("")
+    
+    col1, col2, col3 = st.columns([1.5, 1, 1.5])
     with col2:
-        st.write("")
-        st.write("")
-        col_logo1, col_logo2, col_logo3 = st.columns([1.5, 2, 1.5])
+        col_logo1, col_logo2, col_logo3 = st.columns([1, 1.5, 1])
         with col_logo2:
             st.image(logo_path, use_container_width=True)
             
-        st.markdown("<h2 style='text-align: center; margin-top: 10px; font-weight: 800; letter-spacing: 1px;'>IntelliTrade</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #a0a0a0; font-size: 14px; margin-bottom: 30px;'>Sign in to access your autonomous AI trading swarm.</p>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center; margin-top: 10px;'>Welcome to IntelliTrade</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #888;'>Please sign in to access your AI trading agents.</p>", unsafe_allow_html=True)
         
-        tab1, tab2 = st.tabs(["Secure Login", "Create Account"])
+        tab1, tab2 = st.tabs(["Login", "Sign Up"])
         
         with tab1:
             with st.form("login_form"):
