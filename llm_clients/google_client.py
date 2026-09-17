@@ -6,6 +6,8 @@ from .base_client import BaseLLMClient, normalize_content
 from .validators import validate_model
 
 
+import time
+
 class NormalizedChatGoogleGenerativeAI(ChatGoogleGenerativeAI):
     """ChatGoogleGenerativeAI with normalized content output.
 
@@ -14,6 +16,8 @@ class NormalizedChatGoogleGenerativeAI(ChatGoogleGenerativeAI):
     """
 
     def invoke(self, input, config=None, **kwargs):
+        # Gemini Free Tier limit is 15 RPM. Add a 4 second sleep to prevent RESOURCE_EXHAUSTED.
+        time.sleep(4.1)
         return normalize_content(super().invoke(input, config, **kwargs))
 
 
