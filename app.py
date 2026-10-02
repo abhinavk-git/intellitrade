@@ -96,8 +96,8 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(0, 210, 106, 0.4);
     }
-    /* Hide Sidebar Collapse Button */
-    [data-testid="collapsedControl"] {
+    /* Hide Sidebar Collapse Button but keep Expand Button for mobile */
+    [data-testid="stSidebarCollapseButton"] {
         display: none;
     }
 </style>
