@@ -153,6 +153,16 @@ def get_stock_stats_indicators_window(
             "Usage: Identify overbought (>80) or oversold (<20) conditions and confirm the strength of trends or reversals. "
             "Tips: Use alongside RSI or MACD to confirm signals; divergence between price and MFI can indicate potential reversals."
         ),
+        "bull_neural_volume": (
+            "Bull Neural Volume: A momentum-weighted smoothed volume indicator tracking buying pressure. "
+            "Usage: Identify hidden accumulation by institutional buyers. "
+            "Tips: Confirm with price action breakouts."
+        ),
+        "bear_neural_volume": (
+            "Bear Neural Volume: A momentum-weighted smoothed volume indicator tracking selling pressure. "
+            "Usage: Identify hidden distribution by institutional sellers. "
+            "Tips: Confirm with price action breakdowns."
+        ),
     }
 
     if indicator not in best_ind_params:
@@ -230,7 +240,13 @@ def _get_stock_stats_bulk(
     df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
 
     # Calculate the indicator for all rows at once
-    df[indicator]  # This triggers stockstats to calculate the indicator
+    if indicator in ["bull_neural_volume", "bear_neural_volume"]:
+        df["bull_vol"] = df["volume"] * ((df["close"] - df["low"]) / (df["high"] - df["low"] + 1e-8))
+        df["bear_vol"] = df["volume"] * ((df["high"] - df["close"]) / (df["high"] - df["low"] + 1e-8))
+        df["bull_neural_volume"] = df["bull_vol"].ewm(span=14, adjust=False).mean()
+        df["bear_neural_volume"] = df["bear_vol"].ewm(span=14, adjust=False).mean()
+    else:
+        df[indicator]  # This triggers stockstats to calculate the indicator
 
     # Create a dictionary mapping date strings to indicator values
     result_dict = {}

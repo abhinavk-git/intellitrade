@@ -305,7 +305,13 @@ class StockstatsUtils:
         df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
         curr_date_str = pd.to_datetime(curr_date).strftime("%Y-%m-%d")
 
-        df[indicator]  # trigger stockstats to calculate the indicator
+        if indicator in ["bull_neural_volume", "bear_neural_volume"]:
+            df["bull_vol"] = df["volume"] * ((df["close"] - df["low"]) / (df["high"] - df["low"] + 1e-8))
+            df["bear_vol"] = df["volume"] * ((df["high"] - df["close"]) / (df["high"] - df["low"] + 1e-8))
+            df["bull_neural_volume"] = df["bull_vol"].ewm(span=14, adjust=False).mean()
+            df["bear_neural_volume"] = df["bear_vol"].ewm(span=14, adjust=False).mean()
+        else:
+            df[indicator]  # trigger stockstats to calculate the indicator
         matching_rows = df[df["Date"].str.startswith(curr_date_str)]
 
         if not matching_rows.empty:

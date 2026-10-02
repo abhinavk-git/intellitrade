@@ -26,11 +26,8 @@ firebaseConfig = {
   "databaseURL": ""
 }
 
-try:
-    firebase = pyrebase.initialize_app(firebaseConfig)
-    auth = firebase.auth()
-except Exception as e:
-    auth = None
+firebase = pyrebase.initialize_app(firebaseConfig)
+auth = firebase.auth()
 
 logo_path = os.path.join(os.path.dirname(__file__), "logo.jpg")
 
@@ -107,60 +104,68 @@ import datetime
 
 cookie_manager = stx.CookieManager(key="cookie_manager_comp")
 
-def render_auth_ui():
-    st.write("")
-    st.write("")
-    
-    col1, col2, col3 = st.columns([1.5, 1, 1.5])
-    with col2:
-        col_logo1, col_logo2, col_logo3 = st.columns([1, 1.5, 1])
-        with col_logo2:
-            st.image(logo_path, use_container_width=True)
+def render_auth_ui(container):
+    with container.container():
+        st.write("")
+        st.write("")
+        
+        col1, col2, col3 = st.columns([1.5, 1, 1.5])
+        with col2:
+            col_logo1, col_logo2, col_logo3 = st.columns([1, 1.5, 1])
+            with col_logo2:
+                st.image(logo_path, use_container_width=True)
+                
+            st.markdown("<h2 style='text-align: center; margin-top: 10px;'>Welcome to IntelliTrade</h2>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align: center; color: #888;'>Please sign in to access your AI trading agents.</p>", unsafe_allow_html=True)
             
-        st.markdown("<h2 style='text-align: center; margin-top: 10px;'>Welcome to IntelliTrade</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #888;'>Please sign in to access your AI trading agents.</p>", unsafe_allow_html=True)
-        
-        tab1, tab2 = st.tabs(["Login", "Sign Up"])
-        
-        with tab1:
-            with st.form("login_form"):
-                username = st.text_input("Username")
-                email = st.text_input("Email")
-                password = st.text_input("Password", type="password")
-                submitted = st.form_submit_button("Sign In", use_container_width=True)
-                
-                if submitted:
-                    if auth:
-                        try:
-                            user = auth.sign_in_with_email_and_password(email, password)
-                            st.session_state['user'] = user
-                            # Set a 24-hour cookie
-                            cookie_manager.set("intellitrade_user", user['localId'], expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
-                            st.rerun()
-                        except Exception as e:
-                            if "INVALID_LOGIN_CREDENTIALS" in str(e):
-                                st.error("Incorrect email or password.")
-                            else:
-                                st.error(f"Login failed: Make sure Email/Password Auth is enabled in your Firebase Console.")
-                    else:
-                        st.error("Firebase Auth is not initialized.")
-                        
-        with tab2:
-            with st.form("signup_form"):
-                new_username = st.text_input("Username")
-                new_email = st.text_input("Email")
-                new_password = st.text_input("Password", type="password")
-                signup_submitted = st.form_submit_button("Create Account", use_container_width=True)
-                
-                if signup_submitted:
-                    if auth:
-                        try:
-                            user = auth.create_user_with_email_and_password(new_email, new_password)
-                            st.success(f"Account created for {new_username}! You can now log in.")
-                        except Exception as e:
-                            st.error(f"Signup failed: Make sure Email/Password Auth is enabled in your Firebase Console.")
-                    else:
-                        st.error("Firebase Auth is not initialized.")
+            tab1, tab2 = st.tabs(["Login", "Sign Up"])
+            
+            with tab1:
+                with st.form("login_form"):
+                    username = st.text_input("Username")
+                    password = st.text_input("Password", type="password")
+                    submitted = st.form_submit_button("Sign In", use_container_width=True)
+                    
+                    if submitted:
+                        if auth:
+                            email = f"{username.replace(' ', '').lower()}@intellitrade.app"
+                            try:
+                                user = auth.sign_in_with_email_and_password(email, password)
+                                st.session_state['user'] = user
+                                # Set a 24-hour cookie
+                                cookie_manager.set("intellitrade_user", user['localId'], expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
+                            except Exception as e:
+                                if "INVALID_LOGIN_CREDENTIALS" in str(e):
+                                    st.error("Incorrect username or password.")
+                                else:
+                                    st.error(f"Login failed: Make sure Email/Password Auth is enabled in your Firebase Console.")
+                        else:
+                            st.error("Firebase Auth is not initialized.")
+                            
+            with tab2:
+                with st.form("signup_form"):
+                    new_username = st.text_input("Username")
+                    new_password = st.text_input("Password", type="password")
+                    signup_submitted = st.form_submit_button("Create Account", use_container_width=True)
+                    
+                    if signup_submitted:
+                        if auth:
+                            new_email = f"{new_username.replace(' ', '').lower()}@intellitrade.app"
+                            try:
+                                user = auth.create_user_with_email_and_password(new_email, new_password)
+                                st.success(f"Account created for {new_username}! You can now log in.")
+                            except Exception as e:
+                                import json
+                                try:
+                                    # Pyrebase HTTP errors contain JSON with the real error message
+                                    error_json = e.args[1]
+                                    error_dict = json.loads(error_json)
+                                    real_message = error_dict['error']['message']
+                                    st.error(f"Signup failed: {real_message}")
+                                except Exception:
+                                    st.error(f"Signup failed: {e}")
+                        else:
+                            st.error("Firebase Auth is not initialized.")
 
 # Check for existing 24-hour cookie
 if 'user' not in st.session_state:
@@ -169,8 +174,12 @@ if 'user' not in st.session_state:
         st.session_state['user'] = cached_user
 
 if 'user' not in st.session_state:
-    render_auth_ui()
-    st.stop()
+    auth_container = st.empty()
+    render_auth_ui(auth_container)
+    if 'user' in st.session_state:
+        auth_container.empty()
+    else:
+        st.stop()
 
 # --- Main App (Only runs if logged in) ---
 
