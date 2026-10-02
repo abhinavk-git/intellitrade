@@ -174,6 +174,8 @@ def render_auth_ui(container):
 # Check for existing 24-hour cookie
 if 'user' not in st.session_state:
     cached_user = cookie_manager.get(cookie="intellitrade_user")
+    if not cached_user and hasattr(st, "context") and hasattr(st.context, "cookies"):
+        cached_user = st.context.cookies.get("intellitrade_user")
     if cached_user:
         st.session_state['user'] = cached_user
 
